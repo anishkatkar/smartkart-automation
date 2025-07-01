@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - SmartKart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#319795',
+                        primaryDark: '#0a5d5b',
+                        accent: '#e53e3e',
+                        background: '#f7fafc'
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-inter bg-background">
+<!-- Header/Navigation -->
+<header class="fixed top-0 left-0 w-full bg-white shadow-md z-50">
+    <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between h-16">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center space-x-1 text-primary">
+                <i class="fas fa-shopping-bag text-2xl"></i>
+                <span class="text-xl font-bold">SmartKart</span>
+            </a>
+
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex space-x-8">
+                <a href="index.html" class="font-medium hover:text-primary">Home</a>
+                <a href="products.html" class="font-medium hover:text-primary">Products</a>
+                <a href="products.html" class="font-medium hover:text-primary">Featured</a>
+                <a href="#" class="font-medium hover:text-primary">About</a>
+            </nav>
+
+            <!-- Icons -->
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <button id="cartIcon" class="p-2 text-gray-700 hover:text-primary">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                    </button>
+                    <span id="cartCount" class="absolute -top-1 -right-1 bg-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </div>
+
+                <a href="login.html" class="p-2 text-gray-700 hover:text-primary hidden md:block">
+                    <i class="fas fa-user-circle text-xl"></i>
+                </a>
+
+                <button id="mobileMenuBtn" class="p-2 text-gray-700 md:hidden">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden bg-white md:hidden">
+        <div class="flex flex-col space-y-4 py-4 px-6">
+            <a href="index.html" class="py-2 font-medium hover:text-primary">Home</a>
+            <a href="products.html" class="py-2 font-medium hover:text-primary">Products</a>
+            <a href="products.html" class="py-2 font-medium hover:text-primary">Featured</a>
+            <a href="#" class="py-2 font-medium hover:text-primary">About</a>
+            <a href="login.html" class="py-2 font-medium hover:text-primary">Login</a>
+        </div>
+    </div>
+
+    <!-- Cart Preview -->
+    <div id="cartPreview" class="hidden absolute right-0 top-16 w-full md:w-96 bg-white shadow-xl rounded-lg">
+        <div class="p-4 border-b">
+            <h3 class="text-lg font-bold">Your Cart</h3>
+        </div>
+        <div class="cart-preview" id="cartItems">
+            <!-- Cart items will be loaded here -->
+        </div>
+        <div class="p-4 border-t">
+            <div class="flex justify-between mb-4">
+                <span class="font-medium">Subtotal:</span>
+                <span class="font-bold" id="cartSubtotal">$0.00</span>
+            </div>
+            <a href="cart.html" class="w-full block bg-primary hover:bg-primaryDark text-white text-center py-2 px-4 rounded-lg">View Cart</a>
+        </div>
+    </div>
+</header>
+
+<!-- Page Content -->
+<main class="pt-16">
+    <div class="container mx-auto px-4 py-12">
+        <h1 class="text-3xl font-bold mb-8">Your Shopping Cart</h1>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <div class="lg:w-2/3">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="border-b">
+                        <div class="grid grid-cols-12 p-4 font-bold text-gray-700">
+                            <div class="col-span-6">Product</div>
+                            <div class="col-span-2 text-center">Price</div>
+                            <div class="col-span-2 text-center">Quantity</div>
+                            <div class="col-span-2 text-right">Total</div>
+                        </div>
+                    </div>
+
+                    <div id="cartItemsContainer">
+                        <!-- Cart items will be generated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:w-1/3">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b">
+                        <h2 class="text-xl font-bold mb-4">Order Summary</h2>
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Subtotal</span>
+                                <span class="font-medium" id="cartSubtotalSummary">$0.00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Shipping</span>
+                                <span class="font-medium" id="shippingCost">$0.00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Tax</span>
+                                <span class="font-medium" id="cartTax">$0.00</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between font-bold text-lg py-3 border-t border-b">
+                            <span>Total</span>
+                            <span id="cartTotal">$0.00</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <a href="checkout.html" id="checkoutBtn" class="w-full block text-center bg-primary hover:bg-primaryDark text-white py-3 px-6 rounded-lg font-medium mb-4 transition-all">Proceed to Checkout</a>
+                        <div class="mt-4 flex items-center">
+                            <i class="fas fa-lock text-gray-500 mr-2"></i>
+                            <span class="text-gray-500 text-sm">Secure Checkout</span>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-gray-600 text-sm mb-2">We accept:</p>
+                            <div class="flex space-x-3">
+                                <img src="https://logo.clearbit.com/visa.com" alt="Visa" class="h-8 rounded">
+                                <img src="https://logo.clearbit.com/mastercard.com" alt="Mastercard" class="h-8 rounded">
+                                <img src="https://logo.clearbit.com/americanexpress.com" alt="Amex" class="h-8 rounded">
+                                <img src="https://logo.clearbit.com/paypal.com" alt="PayPal" class="h-8 rounded">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-white pt-16 pb-8">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+            <div class="lg:col-span-2">
+                <a href="index.html" class="flex items-center space-x-1 text-white mb-6">
+                    <i class="fas fa-shopping-bag text-2xl"></i>
+                    <span class="text-xl font-bold">SmartKart</span>
+                </a>
+                <p class="text-gray-400 mb-6">
+                    Bringing you the latest trends in fashion and lifestyle products at affordable prices. We're committed to quality, sustainability, and exceptional customer service.
+                </p>
+                <div class="flex space-x-4">
+                    <a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-primary transition-colors">
+                        <i class="fab fa-pinterest-p"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold mb-6">Shop</h3>
+                <ul class="space-y-3 text-gray-400">
+                    <li><a href="#" class="hover:text-white transition-colors">Men's Clothing</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Women's Clothing</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Footwear</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Accessories</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">New Arrivals</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold mb-6">Customer Service</h3>
+                <ul class="space-y-3 text-gray-400">
+                    <li><a href="#" class="hover:text-white transition-colors">Contact Us</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">FAQs</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Shipping Policy</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Returns & Exchanges</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Track Order</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold mb-6">Stay Updated</h3>
+                <p class="text-gray-400 mb-4">Subscribe to our newsletter for the latest updates and offers.</p>
+                <form>
+                    <div class="flex mb-4">
+                        <input type="email" placeholder="Your email address" class="flex-1 px-4 py-3 rounded-l-lg focus:outline-none text-gray-900">
+                        <button class="bg-primary hover:bg-primaryDark px-4 rounded-r-lg transition-colors">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+                <div class="flex items-center mt-4">
+                    <i class="fas fa-phone mr-3 text-gray-400"></i>
+                    <span>+1 (800) 123-4567</span>
+                </div>
+                <div class="flex items-center mt-2">
+                    <i class="fas fa-envelope mr-3 text-gray-400"></i>
+                    <span>support@smartkart.com</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500">
+            <p>© 2023 SmartKart. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - SmartKart</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: '#E3EF26', dark: '#0C342C', textLight: '#FFFDEE', background: '#f7fafc',
+                },
+                fontFamily: { 'inter': ['Inter', 'sans-serif'] }
+            }
+        }
+    }
+  </script>
+</head>
+<body class="font-inter bg-background">
+<!-- Header -->
+<header id="main-header" class="fixed top-0 left-0 w-full z-50 transition-all duration-300 scrolled">
+  <div class="container mx-auto px-4">
+    <div class="flex items-center justify-between h-20 text-textLight">
+      <a href="index.html" class="flex items-center space-x-2 text-2xl font-bold"><i class="fas fa-shopping-bag"></i><span>SmartKart</span></a>
+      <nav class="hidden md:flex items-center space-x-8">
+        <a href="index.html" class="font-medium hover:text-primary">Home</a>
+        <!-- Dropdown with hover-bridge fix -->
+        <div class="relative group">
+          <a href="products.html" class="font-medium hover:text-primary flex items-center py-8">Products <i class="fas fa-chevron-down ml-2 text-xs"></i></a>
+          <div class="absolute top-full -left-4 -right-4 h-6 bg-transparent"></div>
+          <div class="absolute top-full left-1/2 -translate-x-1/2 pt-6 w-48 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-300 z-50">
+            <div class="bg-dark rounded-md shadow-lg p-2">
+              <a href="products.html?category=Clothing" class="block px-4 py-2 text-sm text-textLight hover:bg-white/10 rounded-md">Clothing</a>
+              <a href="products.html?category=Footwear" class="block px-4 py-2 text-sm text-textLight hover:bg-white/10 rounded-md">Footwear</a>
+              <a href="products.html?category=Home Decor" class="block px-4 py-2 text-sm text-textLight hover:bg-white/10 rounded-md">Home Decor</a>
+              <a href="products.html?category=Accessories" class="block px-4 py-2 text-sm text-textLight hover:bg-white/10 rounded-md">Accessories</a>
+            </div>
+          </div>
+        </div>
+        <a href="index.html#about-section" class="font-medium hover:text-primary">About</a>
+      </nav>
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <a href="checkout.html" id="cartLink" class="p-2 hover:text-primary"><i class="fas fa-shopping-cart text-lg"></i></a>
+          <span id="cartCount" class="absolute -top-1 -right-1 bg-primary text-dark text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">0</span>
+        </div>
+        <!-- Auth Container for Login/Logout Button -->
+        <div id="auth-container"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="checkout-page-content" class="pt-24">
+  <div class="container mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold mb-8 text-center text-dark">Your Order</h1>
+    <div class="max-w-4xl mx-auto flex flex-col lg:flex-row gap-8">
+      <!-- Cart Items -->
+      <div class="lg:w-2/3 bg-white rounded-lg shadow-lg p-6 space-y-4">
+        <h2 class="text-2xl font-bold text-dark border-b pb-4 mb-4">Items in Cart</h2>
+        <div id="checkoutCartItems" class="space-y-4">
+          <!-- Cart items will be rendered here -->
+        </div>
+      </div>
+
+      <!-- Order Summary & Wallet -->
+      <div class="lg:w-1/3">
+        <div class="bg-white rounded-lg shadow-lg p-6 sticky top-28">
+          <h2 class="text-2xl font-bold text-dark mb-4">Summary</h2>
+
+          <div class="mb-6 p-4 bg-primary/20 rounded-lg">
+            <div class="flex justify-between items-center text-dark">
+              <span class="font-medium"><i class="fas fa-wallet mr-2"></i>Wallet Balance:</span>
+              <span id="walletBalance" class="font-bold text-lg">$30,000.00</span>
+            </div>
+          </div>
+
+          <div class="space-y-2 text-dark">
+            <div class="flex justify-between"><span class="text-gray-600">Subtotal:</span><span id="summarySubtotal" class="font-medium">$0.00</span></div>
+            <div class="flex justify-between"><span class="text-gray-600">Tax (10%):</span><span id="summaryTax" class="font-medium">$0.00</span></div>
+            <div class="flex justify-between font-bold text-xl border-t pt-2 mt-2"><span>Total:</span><span id="summaryTotal">$0.00</span></div>
+          </div>
+
+          <button id="buyNowBtn" class="w-full mt-6 bg-dark text-white font-bold py-3 rounded-lg hover:bg-black transition-colors">
+            Pay with Wallet
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="main.js"></script>
+</body>
+</html>

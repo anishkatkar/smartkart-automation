@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="4">
+  <component name="AdditionalModuleElements">
+    <content url="file://$MODULE_DIR$/smartkart-automation" dumb="true">
+      <sourceFolder url="file://$MODULE_DIR$/smartkart-automation/src/test/java" type="java-test-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/smartkart-automation/src/test/java/smartkart" />
+    </content>
+  </component>
+</module>

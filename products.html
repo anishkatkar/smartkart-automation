@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Products - SmartKart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#E3EF26', dark: '#0C342C', textLight: '#FFFDEE', background: '#f7fafc',
+                    },
+                    fontFamily: { 'inter': ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-inter bg-background">
+<!-- Header -->
+<header id="main-header" class="fixed top-0 left-0 w-full z-50 transition-all duration-300 scrolled">
+    <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between h-20 text-textLight">
+            <a href="index.html" class="flex items-center space-x-2 text-2xl font-bold"><i class="fas fa-shopping-bag"></i><span>SmartKart</span></a>
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="font-medium hover:text-primary">Home</a>
+                <!-- Dropdown with hover-bridge fix -->
+                <div class="relative group">
+                    <a href="products.html" class="font-medium hover:text-primary flex items-center py-8">Products <i class="fas fa-chevron-down ml-2 text-xs"></i></a>
+                    <div class="absolute top-full -left-4 -right-4 h-6 bg-transparent"></div>
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 pt-6 w-48 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-300 z-50">
+                        <div class="bg-dark rounded-md shadow-lg p-2">
+                            <a href="products.html?category=Clothing" class="block px-4 py-2 text-sm text-textLight hover:bg-white/10 rounded-md">Clothing</a>
+                            <a href="products.html?category=Footwear" class="block px-4 py-2 text-sm text-textLight hover:bg-white/10 rounded-md">Footwear</a>
+                            <a href="products.html?category=Home Decor" class="block px-4 py-2 text-sm text-textLight hover:bg-white/10 rounded-md">Home Decor</a>
+                            <a href="products.html?category=Accessories" class="block px-4 py-2 text-sm text-textLight hover:bg-white/10 rounded-md">Accessories</a>
+                        </div>
+                    </div>
+                </div>
+                <a href="index.html#about-section" class="font-medium hover:text-primary">About</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <a href="checkout.html" id="cartLink" class="p-2 hover:text-primary"><i class="fas fa-shopping-cart text-lg"></i></a>
+                    <span id="cartCount" class="absolute -top-1 -right-1 bg-primary text-dark text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">0</span>
+                </div>
+                <!-- Auth Container for Login/Logout Button -->
+                <div id="auth-container"></div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main id="product-page-content" class="pt-24">
+    <div class="container mx-auto px-4 py-12">
+        <h1 id="page-title" class="text-4xl font-bold mb-8 text-center text-dark">All Products</h1>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8" id="productGrid">
+            <!-- Products will be loaded by JS here -->
+        </div>
+    </div>
+</main>
+
+<footer class="bg-[#06231D] text-textLight pt-16 pb-8">
+    <!-- Your footer content can be copied from index.html -->
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
