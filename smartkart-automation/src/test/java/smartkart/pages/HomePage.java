@@ -1,4 +1,5 @@
 package smartkart.pages;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -6,19 +7,17 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.time.Duration;
 
 public class HomePage {
     private WebDriver driver;
     private WebDriverWait wait;
 
+    // Locators
     private By productsMenu = By.xpath("//nav//a[contains(text(), 'Products')]");
     private By clothingCategoryLink = By.xpath("//div[contains(@class, 'group-hover:opacity-100')]//a[contains(text(), 'Clothing')]");
     private By featuredProductsSection = By.id("featuredProductsGrid");
     private By cartCount = By.id("cartCountHero"); // Target the hero header cart
-    private By logoutButton = By.cssSelector("button[onclick='logout()']");
-    private By loginLink = By.cssSelector("#auth-container-hero a");
 
     public HomePage(WebDriver driver) {
         this.driver = driver;
@@ -26,7 +25,8 @@ public class HomePage {
     }
 
     public void navigateToLoginPage() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(loginLink)).click();
+        // Corrected: The login link is just an 'a' tag in the hero header icons
+        driver.findElement(By.cssSelector(".absolute.top-0 .fa-user-circle")).click();
     }
 
     public void hoverAndClickClothing() {
@@ -42,19 +42,16 @@ public class HomePage {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", section);
 
         for (int i = 1; i <= 4; i++) {
-            WebElement addToCartBtn = driver.findElement(By.xpath("//*[@id='featuredProductsGrid']/div[" + i + "]//button[contains(text(), 'Add to Cart')]"));
+            // Corrected: More robust XPath and removed the non-existent alert
+            WebElement addToCartBtn = driver.findElement(By.xpath("(//div[@id='featuredProductsGrid']//div[contains(@class, 'product-card')])[" + i + "]//button[contains(text(), 'Add to Cart')]"));
             wait.until(ExpectedConditions.elementToBeClickable(addToCartBtn)).click();
-            wait.until(ExpectedConditions.alertIsPresent()).accept();
+            // Removed: The app does not show an alert here.
         }
     }
 
     public String getCartCount() {
+        // Corrected: Wait for the text to be "4" and then return it
         wait.until(ExpectedConditions.textToBePresentInElementLocated(cartCount, "4"));
         return driver.findElement(cartCount).getText();
-    }
-
-    public void logout() {
-        wait.until(ExpectedConditions.elementToBeClickable(logoutButton)).click();
-        wait.until(ExpectedConditions.alertIsPresent()).accept();
     }
 }
