@@ -12,46 +12,66 @@ import java.time.Duration;
 public class HomePage {
     private WebDriver driver;
     private WebDriverWait wait;
+    private JavascriptExecutor js;
 
-    // Locators
-    private By productsMenu = By.xpath("//nav//a[contains(text(), 'Products')]");
-    private By clothingCategoryLink = By.xpath("//div[contains(@class, 'group-hover:opacity-100')]//a[contains(text(), 'Clothing')]");
+    private By productsMenuHero = By.xpath("//div[contains(@class, 'absolute top-0')]//a[contains(text(), 'Products')]");
+    private By clothingCategoryLinkHero = By.xpath("//div[contains(@class, 'absolute top-0')]//a[text()='Clothing']");
     private By featuredProductsSection = By.id("featuredProductsGrid");
-    private By cartCount = By.id("cartCountHero"); // Target the hero header cart
+    private By cartCount = By.id("cartCountHero");
+    private By cartLinkHero = By.id("cartLinkHero"); // Locator for the cart link
+    private By authContainerHero = By.id("auth-container-hero");
 
     public HomePage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-    }
-
-    public void navigateToLoginPage() {
-        // Corrected: The login link is just an 'a' tag in the hero header icons
-        driver.findElement(By.cssSelector(".absolute.top-0 .fa-user-circle")).click();
+        this.js = (JavascriptExecutor) driver;
     }
 
     public void hoverAndClickClothing() {
         Actions actions = new Actions(driver);
-        WebElement productsLink = driver.findElement(productsMenu);
+        WebElement productsLink = wait.until(ExpectedConditions.elementToBeClickable(productsMenuHero));
         actions.moveToElement(productsLink).perform();
-        WebElement clothingLink = wait.until(ExpectedConditions.visibilityOfElementLocated(clothingCategoryLink));
+        WebElement clothingLink = wait.until(ExpectedConditions.visibilityOfElementLocated(clothingCategoryLinkHero));
         clothingLink.click();
+    }
+    // NEW METHOD
+    public void navigateToLoginPage() {
+        // Corrected: Wait for the container to be present, then find and click the link inside it.
+        WebElement authDiv = wait.until(ExpectedConditions.presenceOfElementLocated(authContainerHero));
+        wait.until(ExpectedConditions.elementToBeClickable(authDiv.findElement(By.tagName("a")))).click();
+    }
+
+    // NEW METHOD
+    public void logout() {
+        WebElement authDiv = wait.until(ExpectedConditions.visibilityOfElementLocated(authContainerHero));
+        wait.until(ExpectedConditions.elementToBeClickable(authDiv.findElement(By.tagName("button")))).click();
     }
 
     public void addFirstFourProductsToCart() {
-        WebElement section = driver.findElement(featuredProductsSection);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", section);
-
+        WebElement section = wait.until(ExpectedConditions.visibilityOfElementLocated(featuredProductsSection));
+        js.executeScript("arguments[0].scrollIntoView(true);", section);
         for (int i = 1; i <= 4; i++) {
-            // Corrected: More robust XPath and removed the non-existent alert
-            WebElement addToCartBtn = driver.findElement(By.xpath("(//div[@id='featuredProductsGrid']//div[contains(@class, 'product-card')])[" + i + "]//button[contains(text(), 'Add to Cart')]"));
-            wait.until(ExpectedConditions.elementToBeClickable(addToCartBtn)).click();
-            // Removed: The app does not show an alert here.
+            addSingleProductToCart(i);
         }
     }
 
+    public void addSingleProductToCart(int productIndex) {
+        WebElement addToCartBtn = driver.findElement(By.xpath("(//div[@id='featuredProductsGrid']//div[contains(@class, 'product-card')])[" + productIndex + "]//button[contains(text(), 'Add to Cart')]"));
+        js.executeScript("arguments[0].scrollIntoView({block: 'center'});", addToCartBtn);
+        wait.until(ExpectedConditions.elementToBeClickable(addToCartBtn));
+        js.executeScript("arguments[0].click();", addToCartBtn);
+        wait.until(ExpectedConditions.alertIsPresent()).accept();
+    }
+
     public String getCartCount() {
-        // Corrected: Wait for the text to be "4" and then return it
         wait.until(ExpectedConditions.textToBePresentInElementLocated(cartCount, "4"));
         return driver.findElement(cartCount).getText();
+    }
+
+    // --- NEW, ROBUST HELPER METHOD ---
+    public void goToCheckout() {
+        // This method uses the reliable JavaScript click to navigate to the checkout page.
+        WebElement cartLink = wait.until(ExpectedConditions.presenceOfElementLocated(cartLinkHero));
+        js.executeScript("arguments[0].click();", cartLink);
     }
 }

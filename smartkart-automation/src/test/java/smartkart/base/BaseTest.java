@@ -25,12 +25,16 @@ public class BaseTest {
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
-        // Corrected: Use a programmatic way to get the absolute path to your file
-        // This is much more reliable than hardcoding C:\ drive paths.
-        String indexPath = Paths.get("index.html").toAbsolutePath().toString();
+        // --- CORRECTED LINE ---
+        // We tell it to go up one directory ("..") from the `smartkart-automation` folder
+        // and then find index.html.
+        String indexPath = Paths.get("../index.html").toAbsolutePath().toString();
+
+        // You can add this line to see the exact path being generated in your console
+        System.out.println("Attempting to open file at: " + indexPath);
+
         driver.get("file:///" + indexPath);
     }
-
     @AfterMethod
     public void tearDown(ITestResult result) {
         if (ITestResult.FAILURE == result.getStatus()) {
