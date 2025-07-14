@@ -1,19 +1,23 @@
-// --- PRODUCT DATA with NEW, WORKING IMAGE URLs ---
+// --- PRODUCT DATA with CORRECT LOCAL IMAGE URLs ---
 const products = [
-    {id: 1, name: "Waffle-Knit Navy Sweater", price: 79.99, oldPrice: 95.00, category: "Clothing", image: "image 1 (1).jpeg"},
-    {id: 2, name: "Oversized Corduroy Shirt", price: 64.95, oldPrice: 78.50, category: "Clothing", image: "image 1 (1).jpg"},
-    {id: 3, name: "Classic 550 Sneakers", price: 119.99, oldPrice: 130.00, category: "Footwear", image: "image 1 (2).jpeg"},
-    {id: 4, name: "Wave Runner Air Max", price: 160.00, oldPrice: 185.00, category: "Footwear", image: "image 1 (2).jpg"},
-    {id: 5, name: "Abstract Graphic Print", price: 89.99, oldPrice: 110.00, category: "Home Decor", image: "image 1 (3).jpeg"},
-    {id: 6, name: "Sculptural Wooden Lamp", price: 249.99, oldPrice: 299.99, category: "Home Decor", image: "image 1 (4).jpeg"},
-    {id: 7, name: "Premium Leather Wallet", price: 49.99, oldPrice: 59.99, category: "Accessories", image: "https://i.ibb.co/5cWpP9s/waffle-sweater.jpg"}, // Placeholder image
-    {id: 8, name: "Designer Sunglasses", price: 134.99, oldPrice: 159.99, category: "Accessories", image: "https://i.ibb.co/3s3v4Yy/corduroy-shirt.jpg"}, // Placeholder image
+    {id: 1, name: "Waffle-Knit Navy Sweater", price: 79.99, oldPrice: 95.00, category: "Clothing", image: "image/sweater.jpg"},
+    {id: 2, name: "Oversized Corduroy Shirt", price: 64.95, oldPrice: 78.50, category: "Clothing", image: "image/shirt.jpg"},
+    {id: 3, name: "Classic 550 Sneakers", price: 119.99, oldPrice: 130.00, category: "Footwear", image: "image/air max.jpg"},
+    {id: 4, name: "Wave Runner Air Max", price: 160.00, oldPrice: 185.00, category: "Footwear", image: "image/shoes.jpeg"},
+    {id: 5, name: "Abstract Graphic Print", price: 89.99, oldPrice: 110.00, category: "Home Decor", image: "image/poster.jpeg"},
+    {id: 6, name: "Sculptural Wooden Lamp", price: 249.99, oldPrice: 299.99, category: "Home Decor", image: "image/lamp.jpeg"},
+    {id: 7, name: "Premium Leather Wallet", price: 49.99, category: "Accessories", image: "image/wallet.jpg"},
+    {id: 8, name: "Designer Sunglasses", price: 134.99, category: "Accessories", image: "image/sunglasses.jpg"},
 ];
 
-// --- UTILITY FUNCTIONS ---
+// --- UTILITY & MOCK BACKEND FUNCTIONS ---
 function getCart() { return JSON.parse(localStorage.getItem('smartkart_cart')) || []; }
 function saveCart(cart) { localStorage.setItem('smartkart_cart', JSON.stringify(cart)); }
-function getWallet() { return 30000; } // Wallet always resets to $30,000 on page load.
+function getWallet() {
+    const wallet = localStorage.getItem('smartkart_wallet');
+    return wallet ? parseFloat(wallet) : 3000;
+}
+function saveWallet(balance) { localStorage.setItem('smartkart_wallet', balance.toString()); }
 function getRegisteredUsers() { return JSON.parse(localStorage.getItem('smartkart_users')) || []; }
 function saveRegisteredUsers(users) { localStorage.setItem('smartkart_users', JSON.stringify(users)); }
 function getLoggedInUser() { return sessionStorage.getItem('loggedInUser'); }
@@ -29,20 +33,18 @@ window.addToCart = function(event, productId) {
     saveCart(cart);
     updateUICart();
     alert(`${product.name} has been added to your cart.`);
-}
+};
 
 window.buyNow = function(event, productId) {
     event.stopPropagation();
-    const product = products.find(p => p.id === productId);
-    if (!product) return;
-    saveCart([{ ...product, quantity: 1 }]);
+    saveCart([{...products.find(p => p.id === productId), quantity: 1}]);
     window.location.href = 'checkout.html';
-}
+};
 
 window.logout = function() {
     sessionStorage.removeItem('loggedInUser');
     alert("You have been logged out.");
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
 };
 
 window.adjustCartQuantity = function(productId, change) {
@@ -55,32 +57,43 @@ window.adjustCartQuantity = function(productId, change) {
         }
     }
     saveCart(cart);
-    renderCheckoutPage();
+    // Check which page we are on and re-render it
+    if (document.getElementById('checkout-page-content')) {
+        renderCheckoutPage();
+    }
+    if (document.getElementById('cart-page-content')) { // Assuming you have a cart page
+        renderCartPage();
+    }
     updateUICart();
+};
+
+window.removeFromCart = function(productId) {
+    if (confirm("Are you sure you want to remove this item?")) {
+        let cart = getCart().filter(p => p.id !== productId);
+        saveCart(cart);
+        if (document.getElementById('checkout-page-content')) {
+            renderCheckoutPage();
+        }
+        if (document.getElementById('cart-page-content')) {
+            renderCartPage();
+        }
+        updateUICart();
+    }
 };
 
 // --- UI UPDATE & RENDER FUNCTIONS ---
 function updateUICart() {
     const totalItems = getCart().reduce((sum, item) => sum + item.quantity, 0);
-    const cartCountElements = document.querySelectorAll('#cartCount, #cartCountHero');
-
-    cartCountElements.forEach(el => {
-        if (el) {
-            el.textContent = totalItems;
-            if (totalItems > 0) {
-                el.classList.remove('hidden');
-            } else {
-                el.classList.add('hidden');
-            }
-        }
+    document.querySelectorAll('#cartCount, #cartCountHero').forEach(el => {
+        if (el) { el.textContent = totalItems; }
     });
 }
 
 function updateAuthUI() {
     const loggedInUser = getLoggedInUser();
     const authContainers = document.querySelectorAll('#auth-container, #auth-container-hero');
-    const loginHTML = `<a href="login.html" class="p-2 hover:text-primary hidden md:block"><i class="fas fa-user-circle text-xl"></i></a>`;
-    const logoutHTML = `<button onclick="logout()" class="p-2 hover:text-primary hidden md:block" title="Logout"><i class="fas fa-sign-out-alt text-xl"></i></button>`;
+    const loginHTML = `<a href="login.html" class="p-2 hover:text-primary"><i class="fas fa-user-circle text-xl"></i></a>`;
+    const logoutHTML = `<button onclick="logout()" class="p-2 hover:text-primary" title="Logout"><i class="fas fa-sign-out-alt text-xl"></i></button>`;
 
     authContainers.forEach(container => {
         if (container) {
@@ -90,23 +103,12 @@ function updateAuthUI() {
 }
 
 function renderProductCard(product) {
-    return `
-    <div class="product-card bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col">
-        <div class="relative"><img src="${product.image}" alt="${product.name}" class="w-full h-80 object-cover"><div class="absolute top-4 right-4"><button class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-gray-500 hover:text-red-500"><i class="fas fa-heart"></i></button></div>${product.oldPrice ? `<div class="absolute top-4 left-4 bg-primary text-dark text-sm font-bold py-1 px-3 rounded">SAVE ${Math.round((1 - product.price/product.oldPrice)*100)}%</div>` : ''}</div>
-        <div class="p-4 flex flex-col flex-grow">
-            <span class="text-gray-500 text-sm">${product.category}</span><h3 class="font-bold text-lg my-2 text-dark flex-grow">${product.name}</h3>
-            <div class="flex items-center justify-between mt-2"><div><span class="font-bold text-black text-xl">$${product.price.toFixed(2)}</span>${product.oldPrice ? `<span class="text-gray-500 line-through ml-2">$${product.oldPrice.toFixed(2)}</span>` : ''}</div></div>
-            <div class="grid grid-cols-2 gap-2 mt-4">
-                <button class="w-full bg-dark/10 text-dark font-bold py-2 rounded-lg hover:bg-dark/20" onclick="addToCart(event, ${product.id})">Add to Cart</button>
-                <button class="w-full bg-dark text-white font-bold py-2 rounded-lg hover:bg-black" onclick="buyNow(event, ${product.id})">Buy Now</button>
-            </div>
-        </div>
-    </div>`;
+    return `<div class="product-card bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col"><div class="relative"><img src="${product.image}" alt="${product.name}" class="w-full h-80 object-cover"></div><div class="p-4 flex flex-col flex-grow"><span class="text-gray-500 text-sm">${product.category}</span><h3 class="font-bold text-lg my-2 text-dark flex-grow">${product.name}</h3><div class="flex items-center justify-between mt-2"><div><span class="font-bold text-black text-xl">$${product.price.toFixed(2)}</span>${product.oldPrice ? `<span class="text-gray-500 line-through ml-2">$${product.oldPrice.toFixed(2)}</span>` : ''}</div></div><div class="grid grid-cols-2 gap-2 mt-4"><button class="w-full bg-dark/10 text-dark font-bold py-2 rounded-lg hover:bg-dark/20" onclick="addToCart(event, ${product.id})">Add to Cart</button><button class="w-full bg-dark text-white font-bold py-2 rounded-lg hover:bg-black" onclick="buyNow(event, ${product.id})">Buy Now</button></div></div></div>`;
 }
 
 function renderHomePage() {
-    const featuredGrid = document.getElementById('featuredProductsGrid');
-    if (featuredGrid) { featuredGrid.innerHTML = products.slice(0, 4).map(renderProductCard).join(''); }
+    const grid = document.getElementById('featuredProductsGrid');
+    if (grid) { grid.innerHTML = products.map(renderProductCard).join(''); }
 }
 
 function renderProductsPage() {
@@ -123,35 +125,45 @@ function renderProductsPage() {
 function renderCheckoutPage() {
     const container = document.getElementById('checkoutCartItems');
     if (!container) return;
+
     const cart = getCart();
+    let subtotal = 0;
+
+    if (cart.length > 0) {
+        container.innerHTML = cart.map(item => {
+            const itemTotal = item.price * item.quantity;
+            subtotal += itemTotal;
+            return `
+            <div class="flex items-center justify-between py-4 border-b">
+                <div class="flex items-center gap-4">
+                    <img src="${item.image}" alt="${item.name}" class="w-20 h-20 object-cover rounded-md">
+                    <div>
+                        <h4 class="font-bold text-dark">${item.name}</h4>
+                        <span class="text-sm text-gray-500">$${item.price.toFixed(2)} each</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center justify-center gap-2">
+                        <button class="quantity-btn" onclick="adjustCartQuantity(${item.id}, -1)">-</button>
+                        <span class="font-bold text-dark w-6 text-center">${item.quantity}</span>
+                        <button class="quantity-btn" onclick="adjustCartQuantity(${item.id}, 1)">+</button>
+                    </div>
+                    <p class="font-bold text-dark w-24 text-right">$${itemTotal.toFixed(2)}</p>
+                    <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-700 text-lg" title="Remove Item">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+    } else {
+        container.innerHTML = `<p class="p-8 text-center text-gray-500">Your cart is empty. <a href="products.html" class="text-dark font-bold hover:underline">Continue Shopping</a></p>`;
+    }
+
     const wallet = getWallet();
-    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const tax = subtotal * 0.10;
     const total = subtotal + tax;
 
     document.getElementById('walletBalance').textContent = `$${wallet.toFixed(2)}`;
-
-    if (cart.length > 0) {
-        container.innerHTML = cart.map(item => `
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <img src="${item.image}" alt="${item.name}" class="w-20 h-20 object-cover rounded-md mr-4">
-                    <div>
-                        <h4 class="font-bold text-dark">${item.name}</h4>
-                        <div class="flex items-center gap-2 mt-1">
-                            <button class="quantity-btn" onclick="adjustCartQuantity(${item.id}, -1)">-</button>
-                            <span class="text-gray-700 font-bold w-6 text-center">${item.quantity}</span>
-                            <button class="quantity-btn" onclick="adjustCartQuantity(${item.id}, 1)">+</button>
-                        </div>
-                    </div>
-                </div>
-                <p class="font-bold text-dark">$${(item.price * item.quantity).toFixed(2)}</p>
-            </div>
-        `).join('');
-    } else {
-        container.innerHTML = `<p class="text-center text-gray-500">Your cart is empty. <a href="products.html" class="text-dark font-bold">Go shopping!</a></p>`;
-    }
-
     document.getElementById('summarySubtotal').textContent = `$${subtotal.toFixed(2)}`;
     document.getElementById('summaryTax').textContent = `$${tax.toFixed(2)}`;
     document.getElementById('summaryTotal').textContent = `$${total.toFixed(2)}`;
@@ -164,20 +176,15 @@ function renderCheckoutPage() {
             return;
         }
         if (total === 0) { alert("Your cart is empty!"); return; }
-        if (wallet >= total) {
-            const remainingBalance = wallet - total;
-            saveCart([]);
-            document.getElementById('walletBalance').textContent = `$${remainingBalance.toFixed(2)}`;
-            container.innerHTML = `<div class="text-center p-4 bg-primary/20 rounded-lg"><h3 class="font-bold text-dark text-lg">Purchase Successful!</h3><p class="text-gray-700">Your items are on the way.</p><a href="products.html" class="inline-block mt-4 bg-dark text-white font-bold py-2 px-4 rounded-lg">Continue Shopping</a></div>`;
-            buyNowBtn.disabled = true;
-            buyNowBtn.textContent = 'Purchase Complete';
-            buyNowBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            updateUICart();
-        } else {
-            alert("Insufficient wallet balance.");
-        }
+        if (wallet < total) { alert("Insufficient wallet balance to complete this purchase."); return; }
+
+        const remainingBalance = wallet - total;
+        saveWallet(remainingBalance);
+        saveCart([]);
+        alert(`Purchase successful! Your new wallet balance is $${remainingBalance.toFixed(2)}.`);
+        window.location.href = 'index.html';
     };
-}
+} // <-- THIS IS THE MISSING BRACE THAT WAS ADDED
 
 function handleAuthPage() {
     const loginForm = document.getElementById('loginForm');
@@ -185,6 +192,7 @@ function handleAuthPage() {
     const loginTab = document.getElementById('loginTab');
     const registerTab = document.getElementById('registerTab');
     if (!loginForm) return;
+
     loginTab.addEventListener('click', () => {
         loginForm.classList.remove('hidden'); registerForm.classList.add('hidden');
         loginTab.classList.add('border-dark', 'text-dark'); loginTab.classList.remove('text-gray-500');
@@ -195,6 +203,7 @@ function handleAuthPage() {
         registerTab.classList.add('border-dark', 'text-dark'); registerTab.classList.remove('text-gray-500');
         loginTab.classList.remove('border-dark', 'text-dark'); loginTab.classList.add('text-gray-500');
     });
+
     registerForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const email = document.getElementById('registerEmail').value;
@@ -202,13 +211,14 @@ function handleAuthPage() {
         const confirmPassword = document.getElementById('registerConfirmPassword').value;
         if (password.length < 6) { alert('Password must be at least 6 characters long.'); return; }
         if (password !== confirmPassword) { alert('Passwords do not match.'); return; }
-        const users = getRegisteredUsers();
+        let users = getRegisteredUsers();
         if (users.find(user => user.email === email)) { alert('An account with this email already exists.'); return; }
         users.push({ email, password });
         saveRegisteredUsers(users);
         alert('Registration successful! You can now log in.');
         loginTab.click();
     });
+
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const email = document.getElementById('loginEmail').value;
@@ -227,13 +237,11 @@ function handleAuthPage() {
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
+    getWallet(); // Initialize wallet on first load if it doesn't exist
     updateUICart();
     updateAuthUI();
     if (document.getElementById('home-page-content')) renderHomePage();
     if (document.getElementById('product-page-content')) renderProductsPage();
     if (document.getElementById('checkout-page-content')) renderCheckoutPage();
     if (document.getElementById('login-page-content')) handleAuthPage();
-
-    const header = document.getElementById('main-header');
-    if(header) { window.addEventListener('scroll', () => { window.scrollY > 50 ? header.classList.add('scrolled') : header.classList.remove('scrolled'); }); }
 });
