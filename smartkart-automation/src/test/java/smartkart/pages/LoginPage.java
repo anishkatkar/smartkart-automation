@@ -25,7 +25,7 @@ public class LoginPage {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
-    public void registerUser(String email, String password) {
+    public void registerUser(String email, String password, String confirmPassword) {
         // THIS IS THE CRITICAL FIX: Click the register tab to make the form visible
         wait.until(ExpectedConditions.elementToBeClickable(registerTab)).click();
 
